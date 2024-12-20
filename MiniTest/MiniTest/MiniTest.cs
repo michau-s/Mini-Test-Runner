@@ -51,7 +51,7 @@
 
     public static class Assert
     {
-        private static void ThrowsException<TException>(Action action, string message = "")
+        public static void ThrowsException<TException>(Action action, string message = "")
         {
             try
             {
@@ -67,7 +67,7 @@
             }
         }
 
-        private static void AreEqual<T>(T? expected, T? actual, string message = "")
+        public static void AreEqual<T>(T? expected, T? actual, string message = "")
         {
             if (expected is IEquatable<T>)
             {
@@ -80,7 +80,7 @@
             throw new AssertionException(message);
         }
 
-        private static void AreNotEqual<T>(T? notExpected, T? actual, string message = "")
+        public static void AreNotEqual<T>(T? notExpected, T? actual, string message = "")
         {
             if (notExpected is IEquatable<T>)
             {
@@ -93,7 +93,7 @@
             throw new AssertionException(message);
         }
 
-        private static void IsTrue(bool condition, string message = "")
+        public static void IsTrue(bool condition, string message = "")
         {
             if (!condition)
             {
@@ -101,7 +101,7 @@
             }
         }
 
-        private static void IsFalse(bool condition, string message = "")
+        public static void IsFalse(bool condition, string message = "")
         {
             if (condition)
             {
@@ -109,7 +109,7 @@
             }
         }
 
-        private static void Fail(string message = "")
+        public static void Fail(string message = "")
         {
             throw new AssertionException(message);
         }
