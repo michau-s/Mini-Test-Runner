@@ -27,7 +27,12 @@
     [AttributeUsage(AttributeTargets.Method)]
     public class PriorityAttribute : System.Attribute
     {
+        private int _priority;
 
+        public PriorityAttribute(int priority)
+        {
+            _priority = priority;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Method)]
@@ -46,7 +51,12 @@
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class DescriptionAttribute : System.Attribute
     {
+        private string? description;
 
+        public DescriptionAttribute(string? description)
+        {
+            this.description = description;
+        }
     }
 
     public static class Assert
