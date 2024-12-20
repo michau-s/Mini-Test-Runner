@@ -35,16 +35,22 @@
         }
     }
 
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class DataRowAttribute : System.Attribute
     {
         private object?[] testData;
-        string? dataset;
+        public string? Description;
 
-        public DataRowAttribute(object?[] testData, string? dataset = null)
+        public DataRowAttribute(object?[] testData, string? description = null)
         {
+            this.Description = description;
             this.testData = testData;
-            this.dataset = dataset;
+        }
+
+        public DataRowAttribute(object? testData, string? description = null)
+        {
+            this.Description = description;
+            this.testData = new object?[] { testData };
         }
     }
 
