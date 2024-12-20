@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.Loader;
 
@@ -8,22 +9,19 @@ namespace MiniTestRunner
     {
         static void Main(string[] args)
         {
+            AssemblyLoadContext context = new AssemblyLoadContext("assembly", isCollectible: true);
+
             foreach (var arg in args)
             {
                 try
                 {
-                    Assembly assembly = Assembly.LoadFrom(arg);
-                    if (AssemblyLoadContext.GetLoadContext(assembly) is null)
-                    {
-                        continue;
-                    }
-                    AssemblyLoadContext context = AssemblyLoadContext.GetLoadContext(assembly)!;
+                    Assembly assembly = context.LoadFromAssemblyPath(arg);
                 }
                 catch(FileNotFoundException)
                 {
                     Console.WriteLine($"{arg}: File not found");
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Console.WriteLine($"{arg}: An error occured when loading the file");
                 }
