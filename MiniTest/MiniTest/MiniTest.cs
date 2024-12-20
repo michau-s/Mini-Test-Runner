@@ -72,14 +72,14 @@
             try
             {
                 action();
-                return;
+                throw new AssertionException($"Expected exception type:<{typeof(TException)}> but no exception was thrown. {message}");
             }
             catch (Exception e)
             {
                 if (e is TException)
                     return;
 
-                throw new AssertionException(message);
+                throw new AssertionException($"Expected exception type:<{typeof(TException)}>. Actual exception type:<{e.GetType()}>. {message}");
             }
         }
 
@@ -93,7 +93,7 @@
                 }
             }
 
-            throw new AssertionException(message);
+            throw new AssertionException($"Expected: {expected?.ToString() ?? "null"}. Actual: {actual?.ToString() ?? "null"}. {message}");
         }
 
         public static void AreNotEqual<T>(T? notExpected, T? actual, string message = "")
@@ -106,7 +106,7 @@
                 }
             }
 
-            throw new AssertionException(message);
+            throw new AssertionException($"Expected any value except: {notExpected?.ToString() ?? "null"}. Actual: {actual?.ToString() ?? "null"}. {message}");
         }
 
         public static void IsTrue(bool condition, string message = "")
