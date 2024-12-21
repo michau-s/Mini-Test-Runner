@@ -24,21 +24,30 @@ namespace MiniTestRunner
                             && type.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0)
                         );
 
-                    var beforeEachMethod = testClass.GetType().GetMethods()
-                        .Where(method => method.GetCustomAttribute(typeof(MiniTest.BeforeEachAttribute)) != null);
+                    foreach (var _class in testClass)
+                    {
+                        var instance = Activator.CreateInstance(_class);
 
-                    var afterEachMethod = testClass.GetType().GetMethods()
-                        .Where(method => method.GetCustomAttribute(typeof(MiniTest.BeforeEachAttribute)) != null);
+                        if (instance == null)
+                            continue;
 
-                    //TODO: Late bind BeforeEach and AfterEach methods to a delegate
+                        var beforeEachMethod = instance.GetType().GetMethods()
+                            .Where(method => method.GetCustomAttribute(typeof(MiniTest.BeforeEachAttribute)) != null).Single();
 
-                    var testMethods = testClass.GetType().GetMethods()
-                        .Where(method => method.GetCustomAttribute(typeof(MiniTest.TestMethodAttribute)) != null);
+                        var afterEachMethod = instance.GetType().GetMethods()
+                            .Where(method => method.GetCustomAttribute(typeof(MiniTest.AfterEachAttribute)) != null).Single();
 
-                    var parametrizedTests = testMethods
-                        .Where(method => method.GetCustomAttributes(typeof(MiniTest.DataRowAttribute)) != null);
+                        Delegate before = Delegate.CreateDelegate(beforeEachMethod.GetType(), beforeEachMethod);
+                        Delegate after = Delegate.CreateDelegate(afterEachMethod.GetType(), afterEachMethod);
 
-                    //TODO: Ignore test methods or attributes with incompatible configurations (e.g., parameter mismatch for DataRow).
+                        var testMethods = instance.GetType().GetMethods()
+                            .Where(method => method.GetCustomAttribute(typeof(MiniTest.TestMethodAttribute)) != null);
+
+                        //TODO: Ignore test methods or attributes with incompatible configurations (e.g., parameter mismatch for DataRow).
+
+                        var parametrizedTests = testMethods
+                            .Where(method => method.GetCustomAttributes(typeof(MiniTest.DataRowAttribute)) != null);
+                    }
                 }
                 catch (FileNotFoundException)
                 {
