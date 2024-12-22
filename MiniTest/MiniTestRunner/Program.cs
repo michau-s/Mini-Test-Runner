@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.Loader;
+using System.Security.Cryptography;
 
 namespace MiniTestRunner
 {
@@ -87,17 +88,26 @@ namespace MiniTestRunner
                                     {
                                         if (before != null)
                                         {
-                                            before.DynamicInvoke(instance);
+                                            before.DynamicInvoke(null);
                                         }
 
                                         var testDataField = dataRow.GetType().GetField("testData");
                                         var parameters = testDataField?.GetValue(dataRow) as object[];
 
-                                        testMethod.Invoke(instance, parameters);
+                                        try
+                                        {
+                                            testMethod.Invoke(instance, parameters);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            if(e.InnerException is AssertionException)
+                                                Console.WriteLine($"Test: {testMethod.Name} failed: {e.InnerException.Message}");
+                                        }
+
 
                                         if (after != null)
                                         {
-                                            after.DynamicInvoke(instance);
+                                            after.DynamicInvoke(null);
                                         }
                                     }
                                     catch (Exception e)
@@ -112,14 +122,22 @@ namespace MiniTestRunner
                                 {
                                     if (before != null)
                                     {
-                                        before.DynamicInvoke(instance);
+                                        before.DynamicInvoke(null);
                                     }
 
-                                    testMethod.Invoke(instance, null);
+                                    try
+                                    {
+                                        testMethod.Invoke(instance, null);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        if(e.InnerException is AssertionException)
+                                            Console.WriteLine($"Test: {testMethod.Name} failed: {e.InnerException.Message}");
+                                    }
 
                                     if (after != null)
                                     {
-                                        after.DynamicInvoke(instance);
+                                        after.DynamicInvoke(null);
                                     }
                                 }
                                 catch (Exception e)
