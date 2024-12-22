@@ -149,7 +149,7 @@ namespace MiniTestRunner
                 .GetType()
                 .GetMethods()
                 .Where(method => method.GetCustomAttribute(typeof(MiniTest.TestMethodAttribute)) != null)
-                .OrderBy(method => (method.GetCustomAttribute(typeof(MiniTest.PriorityAttribute)) as MiniTest.PriorityAttribute)?.Priority ?? int.MaxValue)
+                .OrderBy(method => (method.GetCustomAttribute(typeof(MiniTest.PriorityAttribute)) as MiniTest.PriorityAttribute)?.Priority ?? 0)
                 .ThenBy(method => method.Name)
                 .ToList();
         }
