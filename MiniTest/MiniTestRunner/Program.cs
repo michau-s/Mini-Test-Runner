@@ -12,86 +12,12 @@ namespace MiniTestRunner
     {
         static void Main(string[] args)
         {
-
-            //TODO: Remove nesting
-
             foreach (var arg in args)
             {
                 AssemblyLoadContext context = new AssemblyLoadContext("assembly", isCollectible: true);
-                
-                // Apparently it does not work without this resolver
-                AssemblyDependencyResolver resolver = new AssemblyDependencyResolver(arg);
-
-                context.Resolving += (context, assemblyName) =>
-                {
-                    string? resolvedPath = resolver.ResolveAssemblyToPath(assemblyName);
-                    if (resolvedPath != null)
-                    {
-                        return context.LoadFromAssemblyPath(resolvedPath);
-                    }
-                    return null;
-                };
-
                 try
                 {
-
-                    Assembly assembly = context.LoadFromAssemblyPath(arg);
-
-                    var testClasses = GetTestClasses(assembly);
-
-                    foreach (var testClass in testClasses)
-                    {
-                        var instance = Activator.CreateInstance(testClass);
-
-                        if (instance == null)
-                            continue;
-
-                        var after = GetAfterEach(instance);
-                        var before = GetBeforeEach(instance);
-                        var testMethods = GetMethods(instance);
-
-                        Console.WriteLine($"Class: {testClass.Name}");
-
-                        foreach (var method in testMethods)
-                        {
-                            Console.WriteLine($"Method: {method.Name}");
-                        }
-
-                        //TODO: Ignore test methods or attributes with incompatible configurations (e.g., parameter mismatch for DataRow).
-                        //TODO: Write a warning message to the console in case of such configuration incompatibilities.
-
-                        foreach (var testMethod in testMethods)
-                        {
-                            var dataRows = testMethod.GetCustomAttributes(typeof(MiniTest.DataRowAttribute)).ToList();
-
-                            if (dataRows.Count != 0)
-                            {
-                                foreach (var dataRow in dataRows)
-                                {
-                                    try
-                                    {
-                                        RunTests(instance, testMethod, before, after, dataRow);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Console.WriteLine($"Test {testMethod.Name} failed: {e.Message}");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    RunTests(instance, testMethod, before, after);
-                                }
-                                catch (Exception e)
-                                {
-                                    Console.WriteLine($"Test {testMethod.Name} failed: {e.Message}");
-                                }
-                            }
-                        }
-                    }
-                    context.Unload();
+                    LoadTests(arg, context);
                 }
                 catch (FileNotFoundException)
                 {
@@ -101,10 +27,76 @@ namespace MiniTestRunner
                 {
                     Console.WriteLine($"{arg}: An error occured when loading the file");
                 }
+                context.Unload();
             }
         }
 
-        private static void RunTests(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
+        private static void LoadTests(string arg, AssemblyLoadContext context)
+        {
+            // Apparently it does not work without this resolver
+            AssemblyDependencyResolver resolver = new AssemblyDependencyResolver(arg);
+
+            context.Resolving += (context, assemblyName) =>
+            {
+                string? resolvedPath = resolver.ResolveAssemblyToPath(assemblyName);
+                if (resolvedPath != null)
+                {
+                    return context.LoadFromAssemblyPath(resolvedPath);
+                }
+                return null;
+            };
+
+            Assembly assembly = context.LoadFromAssemblyPath(arg);
+
+            var testClasses = GetTestClasses(assembly);
+
+            foreach (var testClass in testClasses)
+            {
+                var instance = Activator.CreateInstance(testClass);
+
+                if (instance == null)
+                    continue;
+
+                var after = GetAfterEach(instance);
+                var before = GetBeforeEach(instance);
+                var testMethods = GetTestMethods(instance);
+
+                Console.WriteLine($"Class: {testClass.Name}");
+
+                foreach (var method in testMethods)
+                {
+                    Console.WriteLine($"Method: {method.Name}");
+                }
+
+                //TODO: Ignore test methods or attributes with incompatible configurations (e.g., parameter mismatch for DataRow).
+                //TODO: Write a warning message to the console in case of such configuration incompatibilities.
+
+                RunTests(instance, testMethods, before, after);
+
+            }
+        }
+
+        private static void RunTests(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
+        {
+            foreach (var testMethod in testMethods)
+            {
+                var dataRows = testMethod.GetCustomAttributes(typeof(MiniTest.DataRowAttribute)).ToList();
+
+                if (dataRows.Count != 0)
+                {
+                    foreach (var dataRow in dataRows)
+                    {
+                        RunTest(instance, testMethod, before, after, dataRow);
+                    }
+                }
+                else
+                {
+                    RunTest(instance, testMethod, before, after);
+                }
+            }
+        }
+
+        private static void RunTest(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
         {
             object[]? parameters = null;
 
@@ -151,7 +143,7 @@ namespace MiniTestRunner
             return beforeEachMethod == null ? null : Delegate.CreateDelegate(typeof(Action), instance, beforeEachMethod);
         }
 
-        private static List<MethodInfo> GetMethods(object instance)
+        private static List<MethodInfo> GetTestMethods(object instance)
         {
             return instance
                 .GetType()
