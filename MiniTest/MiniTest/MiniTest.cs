@@ -28,6 +28,7 @@
     public class PriorityAttribute : System.Attribute
     {
         private int _priority;
+        public int Priority => _priority;
 
         public PriorityAttribute(int priority)
         {
