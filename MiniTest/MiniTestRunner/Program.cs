@@ -59,7 +59,7 @@ namespace MiniTestRunner
 
                 var after = GetAfterEach(instance);
                 var before = GetBeforeEach(instance);
-                var testMethods = GetTestMethods(instance);
+                var testMethods = GetSortedTestMethods(instance);
 
                 Console.WriteLine($"Class: {testClass.Name}");
 
@@ -143,12 +143,14 @@ namespace MiniTestRunner
             return beforeEachMethod == null ? null : Delegate.CreateDelegate(typeof(Action), instance, beforeEachMethod);
         }
 
-        private static List<MethodInfo> GetTestMethods(object instance)
+        private static List<MethodInfo> GetSortedTestMethods(object instance)
         {
             return instance
                 .GetType()
                 .GetMethods()
                 .Where(method => method.GetCustomAttribute(typeof(MiniTest.TestMethodAttribute)) != null)
+                .OrderBy(method => (method.GetCustomAttribute(typeof(MiniTest.PriorityAttribute)) as MiniTest.PriorityAttribute)?.Priority ?? int.MaxValue)
+                .ThenBy(method => method.Name)
                 .ToList();
         }
 
