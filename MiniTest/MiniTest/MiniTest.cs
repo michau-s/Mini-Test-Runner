@@ -38,7 +38,7 @@
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class DataRowAttribute : System.Attribute
     {
-        private object?[] testData;
+        public object?[] testData;
         public string? Description;
 
         public DataRowAttribute(object?[] testData, string? description = null)
