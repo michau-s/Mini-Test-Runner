@@ -132,7 +132,7 @@
     }
 
     [Serializable]
-    internal class AssertionException : Exception
+    public class AssertionException : Exception
     {
         public AssertionException()
         {
