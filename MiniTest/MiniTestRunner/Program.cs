@@ -75,7 +75,6 @@ namespace MiniTestRunner
                             .Where(method => method.GetCustomAttributes(typeof(MiniTest.DataRowAttribute)) != null);
 
 
-                        //TODO: Fix methods without DataRow reporting parameter missmatch
                         foreach (var testMethod in testMethods)
                         {
                             var dataRows = testMethod.GetCustomAttributes(typeof(MiniTest.DataRowAttribute)).ToList();
