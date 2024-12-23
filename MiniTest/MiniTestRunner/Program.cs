@@ -6,6 +6,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.Loader;
 using System.Security.Cryptography;
+using System.Xml.XPath;
 
 namespace MiniTestRunner
 {
@@ -16,23 +17,35 @@ namespace MiniTestRunner
             foreach (var arg in args)
             {
                 AssemblyLoadContext context = new AssemblyLoadContext("assembly", isCollectible: true);
+
                 try
                 {
                     List<TestData> data = LoadTests(arg, context);
 
+                    (int passed, int total) results = (0,0);
+
                     foreach (var test in data)
                     {
-                        RunTests(test.Instance, test.TestMethods, test.Before, test.After);
+                        var testResults = RunTests(test.Instance, test.TestMethods, test.Before, test.After);
+                        results = (results.passed + testResults.passed, results.total + testResults.total);
+                        Console.WriteLine("######################################################");
                     }
+
+                    Console.WriteLine($"Summary of running tests from {Path.GetFileNameWithoutExtension(arg)}");
+                    Console.WriteLine("**************************");
+                    Console.WriteLine($"* {"Tests passed:",-15} {results.passed,2}/{results.total,-3} *");
+                    Console.WriteLine($"* {"Failed:",-15} {results.total - results.passed,2}     *");
+                    Console.WriteLine("**************************");
                 }
                 catch (FileNotFoundException)
                 {
                     Console.WriteLine($"{arg}: File not found");
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Console.WriteLine($"{arg}: An error occured when loading the file");
+                    Console.WriteLine($"{arg}: An error occured: {e.Message}");
                 }
+
                 context.Unload();
             }
         }
@@ -69,43 +82,78 @@ namespace MiniTestRunner
                 var before = GetBeforeEach(instance);
                 var testMethods = GetSortedTestMethods(instance);
 
-                Console.WriteLine($"Class: {testClass.Name}");
-
-                foreach (var method in testMethods)
-                {
-                    Console.WriteLine($"Method: {method.Name}");
-                }
-
                 tests.Add(new TestData(instance, testMethods, before, after));
-
-                //RunTests(instance, testMethods, before, after);
-
             }
 
             return tests;
         }
 
-        private static void RunTests(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
+        private static (int passed, int total) RunTests(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
         {
+            int totalTestsRun = 0;
+            int passed = 0;
+
+            Console.WriteLine($"Running tests from class {instance.GetType().FullName}...");
+
             foreach (var testMethod in testMethods)
             {
                 var dataRows = testMethod.GetCustomAttributes(typeof(MiniTest.DataRowAttribute)).ToList();
+
+                var descriptionAttribute = (MiniTest.DescriptionAttribute?)testMethod.GetCustomAttribute(typeof(MiniTest.DescriptionAttribute));
+                if (descriptionAttribute != null && !string.IsNullOrEmpty(descriptionAttribute.Description))
+                {
+                    Console.WriteLine(descriptionAttribute.Description);
+                }
 
                 if (dataRows.Count != 0)
                 {
                     foreach (var dataRow in dataRows)
                     {
-                        RunTest(instance, testMethod, before, after, dataRow);
+                        if (RunTest(instance, testMethod, before, after, dataRow))
+                        {
+                            passed++;
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"{testMethod.Name, -70} : PASSED");
+                            Console.ResetColor();
+
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"{testMethod.Name, -70} : FAILED");
+                            Console.ResetColor();
+                        }
+                        totalTestsRun++;
                     }
                 }
                 else
                 {
-                    RunTest(instance, testMethod, before, after);
+                    if(RunTest(instance, testMethod, before, after))
+                    {
+                        passed++;
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine( $"{testMethod.Name, -70} : PASSED");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"{testMethod.Name, -70} : FAILED");
+                        Console.ResetColor();
+                    }
+                    totalTestsRun++;
                 }
             }
+
+            Console.WriteLine("**************************");
+            Console.WriteLine($"* {"Tests passed:", -15} {passed, 2}/{totalTestsRun, -3} *");
+            Console.WriteLine($"* {"Failed:", -15} {totalTestsRun - passed, 2}     *");
+            Console.WriteLine("**************************");
+
+            return (passed, totalTestsRun);
         }
 
-        private static void RunTest(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
+        private static bool RunTest(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
         {
             object[]? parameters = null;
 
@@ -163,13 +211,22 @@ namespace MiniTestRunner
             catch (Exception e)
             {
                 if (e.InnerException is AssertionException)
-                    Console.WriteLine($"Test: {testMethod.Name} failed: {e.InnerException.Message}");
+                {
+                    Console.WriteLine($"{e.InnerException.Message}");
+                    if (after != null)
+                    {
+                        after.DynamicInvoke(null);
+                    }
+                    return false;
+                }
             }
 
             if (after != null)
             {
                 after.DynamicInvoke(null);
             }
+
+            return true;
         }
 
         private static Delegate? GetAfterEach(object instance)
@@ -211,7 +268,11 @@ namespace MiniTestRunner
             foreach (var testClass in testClasses)
             {
                 if (!testClass.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0))
-                    Console.WriteLine($"Warning! {testClass.Name} has no parameterless constructor!");
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"Warning! {testClass.Name} has no parameterless constructor! Skipping class...");
+                    Console.ResetColor();
+                }
 
             }
 
@@ -220,8 +281,6 @@ namespace MiniTestRunner
                 .ToList();
         }
     }
-
-    //private static void RunTests(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
 
     class TestData
     {
