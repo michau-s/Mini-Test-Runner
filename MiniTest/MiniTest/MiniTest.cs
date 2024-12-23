@@ -59,6 +59,7 @@
     public class DescriptionAttribute : System.Attribute
     {
         private string? description;
+        public string? Description => description;
 
         public DescriptionAttribute(string? description)
         {
