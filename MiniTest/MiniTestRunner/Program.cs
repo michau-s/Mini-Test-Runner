@@ -106,6 +106,27 @@ namespace MiniTestRunner
                 parameters = testDataField?.GetValue(dataRow) as object[];
             }
 
+            var testMethodParameters = testMethod.GetParameters();
+
+            if ((parameters == null && testMethodParameters.Length > 0) ||
+                (parameters != null && parameters.Length != testMethodParameters.Length))
+            {
+                Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
+                return;
+            }
+
+            if (parameters != null)
+            {
+                for (int i = 0; i < testMethodParameters.Length; i++)
+                {
+                    if (parameters[i] != null && testMethodParameters[i].ParameterType.IsAssignableFrom(parameters[i].GetType()))
+                    {
+                        Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
+                        return;
+                    }
+                }
+            }
+
             if (before != null)
             {
                 before.DynamicInvoke(null);
@@ -156,12 +177,22 @@ namespace MiniTestRunner
 
         private static List<Type> GetTestClasses(Assembly assembly)
         {
-            return assembly
+            var testClasses = assembly
                 .GetTypes()
                 .Where(type => type.IsClass
                     && type.GetCustomAttribute(typeof(MiniTest.TestClassAttribute)) != null
-                    && type.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0)
                 )
+                .ToList();
+
+            foreach (var testClass in testClasses)
+            {
+                if (!testClass.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0))
+                    Console.WriteLine($"Warning! {testClass.Name} has no parameterless constructor!");
+
+            }
+
+            return testClasses
+                .Where(type => type.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0))
                 .ToList();
         }
     }
