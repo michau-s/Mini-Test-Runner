@@ -8,9 +8,17 @@ using System.Threading.Tasks;
 
 namespace MiniTestRunner
 {
+    /// <summary>
+    /// A static class providing a simple interface to load tests to an AssemblyLoadContext
+    /// </summary>
     static class TestLoader
     {
-
+        /// <summary>
+        /// The primary method used for tests discovery as provided in the task description
+        /// </summary>
+        /// <param name="arg"> A path to the .dll file</param>
+        /// <param name="context"> A context to load to</param>
+        /// <returns></returns>
         public static List<TestData> LoadTests(string arg, AssemblyLoadContext context)
         {
             // Apparently it does not work without this resolver
@@ -49,6 +57,14 @@ namespace MiniTestRunner
             return tests;
         }
 
+        /// <summary>
+        /// A helper method used to recover the method that should be run before each test.
+        /// <remarks>
+        /// It assumes this method returns void and takes no parameters
+        /// </remarks>
+        /// </summary>
+        /// <param name="instance">An instance of a class we want to search</param>
+        /// <returns></returns>
         private static Delegate? GetAfterEach(object instance)
         {
             var afterEachMethod = instance.GetType().GetMethods()
@@ -57,6 +73,14 @@ namespace MiniTestRunner
             return afterEachMethod == null ? null : Delegate.CreateDelegate(typeof(Action), instance, afterEachMethod);
         }
 
+        /// <summary>
+        /// A helper method used to recover the method that should be run before each test.
+        /// <remarks>
+        /// It assumes this method returns void and takes no parameters
+        /// </remarks>
+        /// </summary>
+        /// <param name="instance">An instance of a class we want to search</param>
+        /// <returns></returns>
         private static Delegate? GetBeforeEach(object instance)
         {
             var beforeEachMethod = instance.GetType().GetMethods()
@@ -65,6 +89,11 @@ namespace MiniTestRunner
             return beforeEachMethod == null ? null : Delegate.CreateDelegate(typeof(Action), instance, beforeEachMethod);
         }
 
+        /// <summary>
+        /// A helper method used to recover all methods marked with [TestMethodAttribute] from a class instance
+        /// </summary>
+        /// <param name="instance"> An instance of a class we want to search</param>
+        /// <returns></returns>
         private static List<MethodInfo> GetSortedTestMethods(object instance)
         {
             return instance
@@ -76,6 +105,11 @@ namespace MiniTestRunner
                 .ToList();
         }
 
+        /// <summary>
+        /// A helper method used to recover all classes marked with [TestClassAttribute]
+        /// </summary>
+        /// <param name="assembly"> An assembly to scan for test classes</param>
+        /// <returns></returns>
         private static List<Type> GetTestClasses(Assembly assembly)
         {
             var testClasses = assembly

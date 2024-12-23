@@ -8,8 +8,19 @@ using System.Threading.Tasks;
 
 namespace MiniTestRunner
 {
+    /// <summary>
+    /// A static class providing a simple interface to run tests from an instance of a class
+    /// </summary>
     static class TestRunner
     {
+        /// <summary>
+        /// The primary method used for running tests
+        /// </summary>
+        /// <param name="instance"> An instance of the class we want to test</param>
+        /// <param name="testMethods"> A List of test methods inside the class</param>
+        /// <param name="before"> A delegate to be executed before running every test</param>
+        /// <param name="after"> A delegate to be executed after running every test</param>
+        /// <returns></returns>
         public static (int passed, int total) RunTests(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
         {
             int totalTestsRun = 0;
@@ -89,7 +100,16 @@ namespace MiniTestRunner
             return (passed, totalTestsRun);
         }
 
-        public static (bool status, string failMessege) RunTest(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
+        /// <summary>
+        /// A helper method for RunTests, runs a single test
+        /// </summary>
+        /// <param name="instance"> An instance of the class we want to test</param>
+        /// <param name="testMethod"> A test method to run</param>
+        /// <param name="before"> A delegate to be executed before running the test</param>
+        /// <param name="after"> A delegate to be executed after running the test</param>
+        /// <param name="dataRow"> An optional parameter, if the testMethod requires parameters, they should be passed through this</param>
+        /// <returns></returns>
+        private static (bool status, string failMessege) RunTest(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
         {
             object[]? parameters = null;
 

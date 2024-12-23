@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MiniTestRunner
 {
+    /// <summary>
+    /// A helper class to store data returned by TestLoader.LoadTests()
+    /// </summary>
     class TestData
     {
         object _instance;

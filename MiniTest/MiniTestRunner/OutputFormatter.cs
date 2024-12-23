@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace MiniTestRunner
 {
+    /// <summary>
+    /// A helper class used to format information about the results of the tests
+    /// </summary>
     static class OutputFormatter
     {
+        /// <summary>
+        /// Outputs a formatted table with a summary
+        /// </summary>
+        /// <param name="passed"> Number of the tests that passed</param>
+        /// <param name="total"> Number of total tests performed</param>
         public static void OutPutSummary(int passed, int total)
         {
             Console.WriteLine("**************************");
@@ -16,6 +24,11 @@ namespace MiniTestRunner
             Console.WriteLine("**************************");
         }
 
+        /// <summary>
+        /// Outputs a result of a single parameterless test
+        /// </summary>
+        /// <param name="passed">Number of the tests that passed</param>
+        /// <param name="name">Number of total tests performed</param>
         public static void OutPutTestResult(bool passed, string name)
         {
             if (passed)
@@ -32,6 +45,11 @@ namespace MiniTestRunner
             }
         }
 
+        /// <summary>
+        /// Outputs a result of a single parameterized test
+        /// </summary>
+        /// <param name="passed">Number of the tests that passed</param>
+        /// <param name="description">A description taken from [DataRowAttribute]</param>
         public static void OutPutParametrizedTestResult(bool passed, string description)
         {
             if (passed)
@@ -48,6 +66,10 @@ namespace MiniTestRunner
             }
         }
 
+        /// <summary>
+        /// Outputs a warning
+        /// </summary>
+        /// <param name="warning"> a messege to be used as warning</param>
         public static void OutPutWarning(string warning)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
