@@ -35,6 +35,28 @@ namespace MiniTestRunner
                     {
                         var description = (dataRow as DataRowAttribute)?.Description ?? "No description available";
 
+                        var methodParameters = testMethod.GetParameters();
+                        var testData = (dataRow as DataRowAttribute)?.testData;
+
+                        if (methodParameters.Length != testData?.Length)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"Warning: Skipping {description} due to parameter missmatch!");
+                            Console.ResetColor();
+                            continue;
+                        }
+
+                        for (int i = 0; i < methodParameters.Length; i++)
+                        {
+                            if (testData[i]?.GetType() != methodParameters[i].ParameterType)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine($"Warning: Skipping {description} due to parameter missmatch!");
+                                Console.ResetColor();
+                                break;
+                            }
+                        }
+
                         if (RunTest(instance, testMethod, before, after, dataRow))
                         {
                             passed++;
@@ -76,42 +98,6 @@ namespace MiniTestRunner
                 var testDataField = dataRow.GetType().GetField("testData");
                 parameters = testDataField?.GetValue(dataRow) as object[];
             }
-
-            // var testMethodParameters = testMethod.GetParameters();
-
-            //if ((parameters == null && testMethodParameters.Length > 0) ||
-            //    (parameters != null && parameters.Length != testMethodParameters.Length))
-            //{
-            //    Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
-            //    return;
-            //}
-
-            //if (parameters != null)
-            //{
-            //    for (int i = 0; i < testMethodParameters.Length; i++)
-            //    {
-            //        if (parameters[i] != null && testMethodParameters[i].ParameterType.IsAssignableFrom(parameters[i].GetType()))
-            //        {
-            //            Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
-            //            return;
-            //        }
-            //    }
-            //}
-
-            //if(parameters != null && testMethod.GetParameters().Length != parameters.Length || (parameters == null && testMethodParameters != null) || (parameters != null && testMethodParameters == null))
-            //{
-            //    return;
-            //}
-
-            //for (int i = 0; i < testMethodParameters.Length; i++)
-            //{
-            //    if (parameters == null)
-            //        break;
-            //    if (parameters[i].GetType() != testMethodParameters[i].ParameterType)
-            //    {
-            //        Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test");
-            //    }
-            //}
 
             before?.DynamicInvoke(null);
 
