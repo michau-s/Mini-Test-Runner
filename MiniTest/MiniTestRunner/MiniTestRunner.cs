@@ -19,7 +19,7 @@ namespace MiniTestRunner
                 AssemblyLoadContext context = new AssemblyLoadContext("assembly", isCollectible: true);
                 try
                 {
-                    List<TestData> data = TestLoader.LoadTests(Path.GetFullPath(arg), context);
+                    List<TestData> data = TestLoader.LoadTests(arg, context);
 
                     (int passed, int total) results = (0, 0);
 

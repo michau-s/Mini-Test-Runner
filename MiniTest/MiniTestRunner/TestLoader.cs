@@ -22,6 +22,8 @@ namespace MiniTestRunner
         public static List<TestData> LoadTests(string arg, AssemblyLoadContext context)
         {
             // Apparently it does not work without this resolver
+            arg = Path.GetFullPath(arg);
+
             AssemblyDependencyResolver resolver = new AssemblyDependencyResolver(arg);
 
             context.Resolving += (context, assemblyName) =>
