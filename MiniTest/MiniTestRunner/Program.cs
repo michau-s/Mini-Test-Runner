@@ -3,6 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.Loader;
 using System.Security.Cryptography;
 
@@ -105,24 +106,39 @@ namespace MiniTestRunner
 
             var testMethodParameters = testMethod.GetParameters();
 
-            if ((parameters == null && testMethodParameters.Length > 0) ||
-                (parameters != null && parameters.Length != testMethodParameters.Length))
-            {
-                Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
-                return;
-            }
+            //if ((parameters == null && testMethodParameters.Length > 0) ||
+            //    (parameters != null && parameters.Length != testMethodParameters.Length))
+            //{
+            //    Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
+            //    return;
+            //}
 
-            if (parameters != null)
-            {
-                for (int i = 0; i < testMethodParameters.Length; i++)
-                {
-                    if (parameters[i] != null && testMethodParameters[i].ParameterType.IsAssignableFrom(parameters[i].GetType()))
-                    {
-                        Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
-                        return;
-                    }
-                }
-            }
+            //if (parameters != null)
+            //{
+            //    for (int i = 0; i < testMethodParameters.Length; i++)
+            //    {
+            //        if (parameters[i] != null && testMethodParameters[i].ParameterType.IsAssignableFrom(parameters[i].GetType()))
+            //        {
+            //            Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test method...");
+            //            return;
+            //        }
+            //    }
+            //}
+
+            //if(parameters != null && testMethod.GetParameters().Length != parameters.Length || (parameters == null && testMethodParameters != null) || (parameters != null && testMethodParameters == null))
+            //{
+            //    return;
+            //}
+
+            //for (int i = 0; i < testMethodParameters.Length; i++)
+            //{
+            //    if (parameters == null)
+            //        break;
+            //    if (parameters[i].GetType() != testMethodParameters[i].ParameterType)
+            //    {
+            //        Console.WriteLine($"Warning! {testMethod.Name}: Parameter Mismatch, skipping test");
+            //    }
+            //}
 
             if (before != null)
             {
