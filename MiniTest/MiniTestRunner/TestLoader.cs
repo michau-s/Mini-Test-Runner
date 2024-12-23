@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace MiniTestRunner
 {
     /// <summary>
-    /// A static class providing a simple interface to load tests to an AssemblyLoadContext
+    /// A static class providing a simple interface to load tests to an <see cref="AssemblyLoadContext"/>
     /// </summary>
     static class TestLoader
     {
@@ -18,7 +18,7 @@ namespace MiniTestRunner
         /// </summary>
         /// <param name="arg"> A path to the .dll file</param>
         /// <param name="context"> A context to load to</param>
-        /// <returns></returns>
+        /// <returns> A List of <see cref="TestData" /> structures for testing with <see cref="TestRunner.RunTests(object, List{MethodInfo}, Delegate?, Delegate?)"/></returns>
         public static List<TestData> LoadTests(string arg, AssemblyLoadContext context)
         {
             // Apparently it does not work without this resolver
@@ -34,6 +34,7 @@ namespace MiniTestRunner
                 return null;
             };
 
+            // Extracting the tests
             Assembly assembly = context.LoadFromAssemblyPath(arg);
 
             var testClasses = GetTestClasses(assembly);
@@ -64,7 +65,7 @@ namespace MiniTestRunner
         /// </remarks>
         /// </summary>
         /// <param name="instance">An instance of a class we want to search</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="Delegate?"/> bound to a method marked with <see cref="MiniTest.AfterEachAttribute"/></returns>
         private static Delegate? GetAfterEach(object instance)
         {
             var afterEachMethod = instance.GetType().GetMethods()
@@ -80,7 +81,7 @@ namespace MiniTestRunner
         /// </remarks>
         /// </summary>
         /// <param name="instance">An instance of a class we want to search</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="Delegate?"/> bound to a method marked with <see cref="MiniTest.BeforeEachAttribute"/></returns>
         private static Delegate? GetBeforeEach(object instance)
         {
             var beforeEachMethod = instance.GetType().GetMethods()
@@ -90,10 +91,10 @@ namespace MiniTestRunner
         }
 
         /// <summary>
-        /// A helper method used to recover all methods marked with [TestMethodAttribute] from a class instance
+        /// A helper method used to recover all methods marked with <see cref="MiniTest.TestMethodAttribute"/> from a class instance
         /// </summary>
         /// <param name="instance"> An instance of a class we want to search</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="List{MethodInfo}"/> sorted by <see cref="MiniTest.PriorityAttribute"/> then by the method name alphabetically</returns>
         private static List<MethodInfo> GetSortedTestMethods(object instance)
         {
             return instance
@@ -106,10 +107,10 @@ namespace MiniTestRunner
         }
 
         /// <summary>
-        /// A helper method used to recover all classes marked with [TestClassAttribute]
+        /// A helper method used to recover all classes marked with <see cref="MiniTest.TestClassAttribute"/>
         /// </summary>
         /// <param name="assembly"> An assembly to scan for test classes</param>
-        /// <returns></returns>
+        /// <returns>A <see cref="List{Type}"/> of test classes found in the assembly</returns>
         private static List<Type> GetTestClasses(Assembly assembly)
         {
             var testClasses = assembly

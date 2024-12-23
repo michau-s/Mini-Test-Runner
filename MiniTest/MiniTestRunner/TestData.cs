@@ -8,26 +8,40 @@ using System.Threading.Tasks;
 namespace MiniTestRunner
 {
     /// <summary>
-    /// A helper class to store data returned by TestLoader.LoadTests()
+    /// A helper class to store data returned by <see cref="TestLoader.LoadTests(string, System.Runtime.Loader.AssemblyLoadContext)"/>
     /// </summary>
     class TestData
     {
-        object _instance;
-        List<MethodInfo> testMethods;
-        Delegate? _before;
-        Delegate? _after;
+        /// <summary>
+        /// The instance of the class containing the test methods.
+        /// </summary>
+        public object Instance { get; set; }
+        /// <summary>
+        /// The list of test methods discovered in the class.
+        /// </summary>
+        public List<MethodInfo> TestMethods { get; set; }
+        /// <summary>
+        /// A delegate to be executed before each test method.
+        /// </summary>
+        public Delegate? Before { get; set; }
+        /// <summary>
+        /// A delegate to be executed after each test method.
+        /// </summary>
+        public Delegate? After { get; set; }
 
-        public object Instance => _instance;
-        public List<MethodInfo> TestMethods => testMethods;
-        public Delegate? Before => _before;
-        public Delegate? After => _after;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestData"/> class with the specified parameters.
+        /// </summary>
+        /// <param name="instance">The instance of the class containing the test methods.</param>
+        /// <param name="testMethods">The list of test methods discovered in the class.</param>
+        /// <param name="before">A delegate to be executed before each test method runs.</param>
+        /// <param name="after">A delegate to be executed after each test method runs.</param>
         public TestData(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
         {
-            _instance = instance;
-            this.testMethods = testMethods;
-            _before = before;
-            _after = after;
+            Instance = instance;
+            this.TestMethods = testMethods;
+            Before = before;
+            After = after;
         }
     }
 }

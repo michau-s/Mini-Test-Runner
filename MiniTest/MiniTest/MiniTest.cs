@@ -1,41 +1,58 @@
 ﻿namespace MiniTest
 {
+    /// <summary>
+    /// An attribute used to mark a class as a test class
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class TestClassAttribute : System.Attribute
     {
 
     }
 
+    /// <summary>
+    /// An attribute used to mark a method as a test method
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class TestMethodAttribute : System.Attribute
     {
 
     }
 
+    /// <summary>
+    /// An attribute used to indicate a setup method to be ran after each test
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class BeforeEachAttribute : System.Attribute
     {
 
     }
 
+    /// <summary>
+    /// An attribute used to indicate a cleanup method to be ran after each test
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class AfterEachAttribute : System.Attribute
     {
 
     }
 
+    /// <summary>
+    /// An attribute used to set priorioty for a test method
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class PriorityAttribute : System.Attribute
     {
-        private int _priority;
-        public int Priority => _priority;
+        public int Priority { get; }
 
         public PriorityAttribute(int priority)
         {
-            _priority = priority;
+            Priority = priority;
         }
     }
 
+    /// <summary>
+    /// An attribute used to pass parameters to test methods that require them
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class DataRowAttribute : System.Attribute
     {
@@ -55,18 +72,23 @@
         }
     }
 
+    /// <summary>
+    /// An attribute used to provide a description for a test class or method
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class DescriptionAttribute : System.Attribute
     {
-        private string? description;
-        public string? Description => description;
+        public string? Description { get; }
 
         public DescriptionAttribute(string? description)
         {
-            this.description = description;
+            this.Description = description;
         }
     }
 
+    /// <summary>
+    /// A static providing ways to assert the tests
+    /// </summary>
     public static class Assert
     {
         public static void ThrowsException<TException>(Action action, string message = "")
@@ -133,17 +155,28 @@
         }
     }
 
+    /// <summary>
+    /// A class implementing the exception to be used in <see cref="Assert"/>
+    /// </summary>
     [Serializable]
     public class AssertionException : Exception
     {
+        /// <summary>
+        /// Thrown when a method from <see cref="Assert"/> fails
+        /// </summary>
         public AssertionException()
         {
         }
-
+        /// <summary>
+        /// Thrown when a method from <see cref="Assert"/> fails
+        /// </summary>
         public AssertionException(string? message) : base(message)
         {
         }
 
+        /// <summary>
+        /// Thrown when a method from <see cref="Assert"/> fails
+        /// </summary>
         public AssertionException(string? message, Exception? innerException) : base(message, innerException)
         {
         }

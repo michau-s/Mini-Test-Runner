@@ -12,7 +12,7 @@ namespace MiniTestRunner
     static class OutputFormatter
     {
         /// <summary>
-        /// Outputs a formatted table with a summary
+        /// Outputs a formatted table with a summary of test results
         /// </summary>
         /// <param name="passed"> Number of the tests that passed</param>
         /// <param name="total"> Number of total tests performed</param>
@@ -29,7 +29,8 @@ namespace MiniTestRunner
         /// </summary>
         /// <param name="passed">Number of the tests that passed</param>
         /// <param name="name">Number of total tests performed</param>
-        public static void OutPutTestResult(bool passed, string name)
+        /// <param name="eMessage">An optional parameter with an error messege in case of a failed test</param>
+        public static void OutPutTestResult(bool passed, string name, string? eMessage = null)
         {
             if (passed)
             {
@@ -42,6 +43,12 @@ namespace MiniTestRunner
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"{name,-70} : FAILED");
                 Console.ResetColor();
+                if (eMessage != null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(eMessage);
+                    Console.ResetColor();
+                }
             }
         }
 
@@ -49,8 +56,9 @@ namespace MiniTestRunner
         /// Outputs a result of a single parameterized test
         /// </summary>
         /// <param name="passed">Number of the tests that passed</param>
-        /// <param name="description">A description taken from [DataRowAttribute]</param>
-        public static void OutPutParametrizedTestResult(bool passed, string description)
+        /// <param name="description">A description taken from <see cref="[DataRowAttribute]"/></param>
+        /// <param name="eMessage">An optional parameter with an error messege in case of a failed test</param>
+        public static void OutPutParametrizedTestResult(bool passed, string description, string? eMessage = null)
         {
             if (passed)
             {
@@ -63,11 +71,17 @@ namespace MiniTestRunner
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"- {description,-68} : FAILED");
                 Console.ResetColor();
+                if (eMessage != null)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(eMessage);
+                    Console.ResetColor();
+                }
             }
         }
 
         /// <summary>
-        /// Outputs a warning
+        /// Outputs a warning to the console, in yellow
         /// </summary>
         /// <param name="warning"> a messege to be used as warning</param>
         public static void OutPutWarning(string warning)
