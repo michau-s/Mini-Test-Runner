@@ -42,16 +42,9 @@
         public object?[] testData;
         public string? Description;
 
-        public DataRowAttribute(object?[] testData, string? description = null)
+        public DataRowAttribute(params object?[] testData)
         {
-            this.Description = description;
             this.testData = testData;
-        }
-
-        public DataRowAttribute(object? testData, string? description = null)
-        {
-            this.Description = description;
-            this.testData = new object?[] { testData };
         }
     }
 
