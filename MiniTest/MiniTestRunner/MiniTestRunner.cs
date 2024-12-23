@@ -14,6 +14,7 @@ namespace MiniTestRunner
     {
         static void Main(string[] args)
         {
+            // It needs to be an ABSOLUTE path, for some reason relative paths don't work
             foreach (var arg in args)
             {
                 AssemblyLoadContext context = new AssemblyLoadContext("assembly", isCollectible: true);
