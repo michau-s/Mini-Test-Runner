@@ -68,9 +68,6 @@ namespace MiniTestRunner
                     Console.WriteLine($"Method: {method.Name}");
                 }
 
-                //TODO: Ignore test methods or attributes with incompatible configurations (e.g., parameter mismatch for DataRow).
-                //TODO: Write a warning message to the console in case of such configuration incompatibilities.
-
                 RunTests(instance, testMethods, before, after);
 
             }
