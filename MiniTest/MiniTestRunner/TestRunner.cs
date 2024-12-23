@@ -57,7 +57,8 @@ namespace MiniTestRunner
                             }
                         }
 
-                        if (RunTest(instance, testMethod, before, after, dataRow))
+                        var result = RunTest(instance, testMethod, before, after);
+                        if (result.status)
                         {
                             passed++;
                             OutputFormatter.OutPutParametrizedTestResult(true, description);
@@ -65,13 +66,15 @@ namespace MiniTestRunner
                         else
                         {
                             OutputFormatter.OutPutParametrizedTestResult(false, description);
+                            Console.WriteLine($"{result.failMessege}");
                         }
                         totalTestsRun++;
                     }
                 }
                 else
                 {
-                    if (RunTest(instance, testMethod, before, after))
+                    var result = RunTest(instance, testMethod, before, after);
+                    if (result.status)
                     {
                         passed++;
                         OutputFormatter.OutPutTestResult(true, testMethod.Name);
@@ -79,6 +82,7 @@ namespace MiniTestRunner
                     else
                     {
                         OutputFormatter.OutPutTestResult(false, testMethod.Name);
+                        Console.WriteLine($"{result.failMessege}");
                     }
                     totalTestsRun++;
                 }
@@ -89,7 +93,7 @@ namespace MiniTestRunner
             return (passed, totalTestsRun);
         }
 
-        public static bool RunTest(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
+        public static (bool status, string failMessege) RunTest(object instance, MethodInfo testMethod, Delegate? before, Delegate? after, Attribute? dataRow = null)
         {
             object[]? parameters = null;
 
@@ -109,18 +113,17 @@ namespace MiniTestRunner
             {
                 if (e.InnerException is AssertionException)
                 {
-                    Console.WriteLine($"{e.InnerException.Message}");
                     if (after != null)
                     {
                         after.DynamicInvoke(null);
                     }
-                    return false;
+                    return (false, e.InnerException.Message);
                 }
             }
 
             after?.DynamicInvoke(null);
 
-            return true;
+            return (true, "");
         }
     }
 }
