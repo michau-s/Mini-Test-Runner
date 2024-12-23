@@ -89,11 +89,8 @@ namespace MiniTestRunner
             {
                 if (!testClass.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0))
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"Warning! {testClass.Name} has no parameterless constructor! Skipping class...");
-                    Console.ResetColor();
+                    OutputFormatter.OutPutWarning($"Warning! {testClass.Name} has no parameterless constructor! Skipping class...");
                 }
-
             }
 
             return testClasses

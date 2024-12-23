@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MiniTestRunner": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\Michał\\Desktop\\Nowy folder (5)\\P3A_24Z_Project1\\MiniTest\\AuthenticationService.Tests\\bin\\Debug\\net8.0\\AuthenticationService.Tests.dll\""
+    }
+  }
+}

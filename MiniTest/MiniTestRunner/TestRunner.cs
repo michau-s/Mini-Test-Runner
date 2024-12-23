@@ -40,9 +40,7 @@ namespace MiniTestRunner
 
                         if (methodParameters.Length != testData?.Length)
                         {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"Warning: Skipping {description} due to parameter missmatch!");
-                            Console.ResetColor();
+                            OutputFormatter.OutPutWarning($"Warning: Skipping {description} due to parameter missmatch!");
                             continue;
                         }
 
@@ -50,9 +48,7 @@ namespace MiniTestRunner
                         {
                             if (testData[i]?.GetType() != methodParameters[i].ParameterType)
                             {
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine($"Warning: Skipping {description} due to parameter missmatch!");
-                                Console.ResetColor();
+                                OutputFormatter.OutPutWarning($"Warning: Skipping {description} due to parameter missmatch!");
                                 break;
                             }
                         }

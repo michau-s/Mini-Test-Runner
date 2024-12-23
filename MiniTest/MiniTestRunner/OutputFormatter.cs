@@ -47,5 +47,12 @@ namespace MiniTestRunner
                 Console.ResetColor();
             }
         }
+
+        public static void OutPutWarning(string warning)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(warning);
+            Console.ResetColor();
+        }
     }
 }
