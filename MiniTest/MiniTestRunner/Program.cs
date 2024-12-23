@@ -107,20 +107,24 @@ namespace MiniTestRunner
 
                 if (dataRows.Count != 0)
                 {
+                    Console.WriteLine($"{testMethod.Name,-70}");
+
                     foreach (var dataRow in dataRows)
                     {
+                        var description = (dataRow as DataRowAttribute)?.Description ?? "No description available";
+
                         if (RunTest(instance, testMethod, before, after, dataRow))
                         {
                             passed++;
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"{testMethod.Name, -70} : PASSED");
+                            Console.WriteLine($"- {description, -68} : PASSED");
                             Console.ResetColor();
 
                         }
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"{testMethod.Name, -70} : FAILED");
+                            Console.WriteLine($"- {description, -68} : FAILED");
                             Console.ResetColor();
                         }
                         totalTestsRun++;
