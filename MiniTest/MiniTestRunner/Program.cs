@@ -18,7 +18,12 @@ namespace MiniTestRunner
                 AssemblyLoadContext context = new AssemblyLoadContext("assembly", isCollectible: true);
                 try
                 {
-                    LoadTests(arg, context);
+                    List<TestData> data = LoadTests(arg, context);
+
+                    foreach (var test in data)
+                    {
+                        RunTests(test.Instance, test.TestMethods, test.Before, test.After);
+                    }
                 }
                 catch (FileNotFoundException)
                 {
@@ -32,7 +37,7 @@ namespace MiniTestRunner
             }
         }
 
-        private static void LoadTests(string arg, AssemblyLoadContext context)
+        private static List<TestData> LoadTests(string arg, AssemblyLoadContext context)
         {
             // Apparently it does not work without this resolver
             AssemblyDependencyResolver resolver = new AssemblyDependencyResolver(arg);
@@ -50,6 +55,8 @@ namespace MiniTestRunner
             Assembly assembly = context.LoadFromAssemblyPath(arg);
 
             var testClasses = GetTestClasses(assembly);
+
+            List<TestData> tests = new List<TestData>();
 
             foreach (var testClass in testClasses)
             {
@@ -69,9 +76,13 @@ namespace MiniTestRunner
                     Console.WriteLine($"Method: {method.Name}");
                 }
 
-                RunTests(instance, testMethods, before, after);
+                tests.Add(new TestData(instance, testMethods, before, after));
+
+                //RunTests(instance, testMethods, before, after);
 
             }
+
+            return tests;
         }
 
         private static void RunTests(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
@@ -207,6 +218,29 @@ namespace MiniTestRunner
             return testClasses
                 .Where(type => type.GetConstructors().Any(ctor => ctor.GetParameters().Length == 0))
                 .ToList();
+        }
+    }
+
+    //private static void RunTests(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
+
+    class TestData
+    {
+        object _instance;
+        List<MethodInfo> testMethods;
+        Delegate? _before;
+        Delegate? _after;
+
+        public object Instance => _instance;
+        public List<MethodInfo> TestMethods => testMethods;
+        public Delegate? Before => _before;
+        public Delegate? After => _after;
+
+        public TestData(object instance, List<MethodInfo> testMethods, Delegate? before, Delegate? after)
+        {
+            _instance = instance;
+            this.testMethods = testMethods;
+            _before = before;
+            _after = after;
         }
     }
 }
