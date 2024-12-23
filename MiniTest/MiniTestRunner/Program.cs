@@ -26,16 +26,14 @@ namespace MiniTestRunner
 
                     foreach (var test in data)
                     {
+                        //apparently I cannot += on tuples so this works
                         var testResults = RunTests(test.Instance, test.TestMethods, test.Before, test.After);
                         results = (results.passed + testResults.passed, results.total + testResults.total);
                         Console.WriteLine("######################################################");
                     }
 
                     Console.WriteLine($"Summary of running tests from {Path.GetFileNameWithoutExtension(arg)}");
-                    Console.WriteLine("**************************");
-                    Console.WriteLine($"* {"Tests passed:",-15} {results.passed,2}/{results.total,-3} *");
-                    Console.WriteLine($"* {"Failed:",-15} {results.total - results.passed,2}     *");
-                    Console.WriteLine("**************************");
+                    OutputFormatter.OutPutSummary(results.passed, results.total);
                 }
                 catch (FileNotFoundException)
                 {
@@ -116,16 +114,11 @@ namespace MiniTestRunner
                         if (RunTest(instance, testMethod, before, after, dataRow))
                         {
                             passed++;
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine($"- {description, -68} : PASSED");
-                            Console.ResetColor();
-
+                            OutputFormatter.OutPutParametrizedTestResult(true, description);
                         }
                         else
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine($"- {description, -68} : FAILED");
-                            Console.ResetColor();
+                            OutputFormatter.OutPutParametrizedTestResult(false, description);
                         }
                         totalTestsRun++;
                     }
@@ -135,24 +128,17 @@ namespace MiniTestRunner
                     if(RunTest(instance, testMethod, before, after))
                     {
                         passed++;
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine( $"{testMethod.Name, -70} : PASSED");
-                        Console.ResetColor();
+                        OutputFormatter.OutPutTestResult(true, testMethod.Name);
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"{testMethod.Name, -70} : FAILED");
-                        Console.ResetColor();
+                        OutputFormatter.OutPutTestResult(false, testMethod.Name);
                     }
                     totalTestsRun++;
                 }
             }
 
-            Console.WriteLine("**************************");
-            Console.WriteLine($"* {"Tests passed:", -15} {passed, 2}/{totalTestsRun, -3} *");
-            Console.WriteLine($"* {"Failed:", -15} {totalTestsRun - passed, 2}     *");
-            Console.WriteLine("**************************");
+            OutputFormatter.OutPutSummary(passed, totalTestsRun);
 
             return (passed, totalTestsRun);
         }
@@ -167,7 +153,7 @@ namespace MiniTestRunner
                 parameters = testDataField?.GetValue(dataRow) as object[];
             }
 
-            var testMethodParameters = testMethod.GetParameters();
+            // var testMethodParameters = testMethod.GetParameters();
 
             //if ((parameters == null && testMethodParameters.Length > 0) ||
             //    (parameters != null && parameters.Length != testMethodParameters.Length))
@@ -203,10 +189,7 @@ namespace MiniTestRunner
             //    }
             //}
 
-            if (before != null)
-            {
-                before.DynamicInvoke(null);
-            }
+            before?.DynamicInvoke(null);
 
             try
             {
@@ -225,10 +208,7 @@ namespace MiniTestRunner
                 }
             }
 
-            if (after != null)
-            {
-                after.DynamicInvoke(null);
-            }
+            after?.DynamicInvoke(null);
 
             return true;
         }
@@ -304,6 +284,49 @@ namespace MiniTestRunner
             this.testMethods = testMethods;
             _before = before;
             _after = after;
+        }
+    }
+
+    static class OutputFormatter
+    {
+        public static void OutPutSummary(int passed, int total)
+        {
+            Console.WriteLine("**************************");
+            Console.WriteLine($"* {"Tests passed:",-15} {passed,2}/{total,-3} *");
+            Console.WriteLine($"* {"Failed:",-15} {total - passed,2}     *");
+            Console.WriteLine("**************************");
+        }
+
+        public static void OutPutTestResult(bool passed, string name)
+        {
+            if (passed)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"{name,-70} : PASSED");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"{name,-70} : FAILED");
+                Console.ResetColor();
+            }
+        }
+
+        public static void OutPutParametrizedTestResult(bool passed, string description)
+        {
+            if ( passed )
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"- {description,-68} : PASSED");
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"- {description,-68} : FAILED");
+                Console.ResetColor();
+            }
         }
     }
 }
