@@ -14,7 +14,7 @@ namespace MiniTestRunner
     {
         static void Main(string[] args)
         {
-            // It needs to be an ABSOLUTE path, for some reason relative paths don't work
+            // It needs to be an ABSOLUTE path
             foreach (var arg in args)
             {
                 AssemblyLoadContext context = new AssemblyLoadContext("assembly", isCollectible: true);
@@ -26,7 +26,6 @@ namespace MiniTestRunner
 
                     foreach (var test in data)
                     {
-                        //apparently I cannot += on tuples so this works
                         var testResults = TestRunner.RunTests(test.Instance, test.TestMethods, test.Before, test.After);
                         results = (results.passed + testResults.passed, results.total + testResults.total);
                         Console.WriteLine("######################################################");

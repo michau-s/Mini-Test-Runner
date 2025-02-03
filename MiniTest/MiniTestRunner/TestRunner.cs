@@ -46,7 +46,7 @@ namespace MiniTestRunner
                     Console.WriteLine(descriptionAttribute.Description);
                 }
 
-                // If this is a parametrized test we handle it differently (I could probably handle it in one block of code but couldn't figure out how)
+                // If this is a parametrized test we handle it differently
                 if (dataRows.Count != 0)
                 {
                     Console.WriteLine($"{testMethod.Name,-70}");

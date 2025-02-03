@@ -21,7 +21,7 @@ namespace MiniTestRunner
         /// <returns> A List of <see cref="TestData" /> structures for testing with <see cref="TestRunner.RunTests(object, List{MethodInfo}, Delegate?, Delegate?)"/></returns>
         public static List<TestData> LoadTests(string arg, AssemblyLoadContext context)
         {
-            // Apparently it does not work without this resolver
+            // Resolver
             arg = Path.GetFullPath(arg);
 
             AssemblyDependencyResolver resolver = new AssemblyDependencyResolver(arg);
