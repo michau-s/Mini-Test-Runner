@@ -1,7 +1,7 @@
 # MiniTestRunner
 
 ## Description
-MiniTestRunner was developed as part of the Programming 3 Advanced course during the winter semester of 2024/2025 academic year.
+MiniTestRunner was developed as part of the Programming 3 - Advanced course during the winter semester of 2024/2025 academic year.
 
 It aims to be a lightweight unit test framework working in the console, supporting custom attributes and assertions to manage the test's lifecycle.
 
@@ -27,7 +27,7 @@ For the guide on how to mark methods and classes as test containers, see [MiniTe
 ## Implementation
 Four primary classes have been implemented:
 - **TestLoader** - Provides an interface for loading the tests, scans the `.dll` for classes and methods marked with specified attributes and stores them in **TestData**.
-- **TestRunner** - Provides an interface for running test stored in **TestData**.
+- **TestRunner** - Provides an interface for running test a stored in **TestData**.
 - **OutputFormatter** - An output formatter, used to quickly output results, warnings and summaries to the console. 
 - **TestData** - A class used to store and encapsulate a single test.
 
