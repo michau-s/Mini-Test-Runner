@@ -8,7 +8,7 @@ It aims to be a lightweight unit test framework working in the console, supporti
 ## Running the program
 Simply compile the project and run `./MiniTestRunner <path-to-test-assembly.dll>` with an absolute path as the program's argument.
 
-For example, you can run it on the included `AuthenticationService.Tests.dll"` library:
+For example, you can run it on the included `AuthenticationService.Tests.dll` library:
 
 ```
 ./MiniTestRunner ~\MiniTestFramework\MiniTest\AuthenticationService.Tests\bin\Debug\net8.0\AuthenticationService.Tests.dll
@@ -31,7 +31,7 @@ Four primary classes have been implemented:
 - **OutputFormatter** - An output formatter, used to quickly output results, warnings and summaries to the console. 
 - **TestData** - A class used to store and encapsulate a single test.
 
-You are encouraged to take a look at the XML documentation for supplementary information about the implementation. Additionally, the original task description has been included below for convenience.
+You are encouraged to take a look at the XML documentation for supplementary information about the implementation. Additionally, the original task description has been in form of a `.pdf` file for convenience.
 
 ## MiniTest
 
